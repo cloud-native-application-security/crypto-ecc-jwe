@@ -18,6 +18,7 @@
 
   <properties>
     <java.version>11</java.version>
+    <spring-security.version>5.4.1</spring-security.version>
   </properties>
 
   <modules>

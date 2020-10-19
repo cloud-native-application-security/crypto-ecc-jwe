@@ -1,9 +1,12 @@
 package com.example.payments;
 
-import com.example.util.CryptoUtils;
-import com.example.util.JsonUtils;
-import com.example.util.KeyExchange;
-import java.util.Base64;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWEObject;
+import com.nimbusds.jose.crypto.X25519Decrypter;
+import com.nimbusds.jose.jwk.Curve;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
+import java.text.ParseException;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,22 +17,30 @@ public class PaymentsController {
 
   @GetMapping("/")
   public String processRefunds() {
+    try {
 
-    var keyExchange = new KeyExchange();
-    var request = new ReportRequest();
-    request.setPublicKey(keyExchange.getPublicKey());
+      OctetKeyPair octetKeyPair = new OctetKeyPairGenerator(Curve.X25519).generate();
+      var publicKey = octetKeyPair.toPublicJWK().toJSONString();
 
-    var restTemplate = new RestTemplate();
-    restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-    var response =
-        restTemplate.postForObject("http://localhost:8082/refunds", request, ReportResponse.class);
-    var decryptionKey = keyExchange.establishAes256bitKey(response.getPublicKey());
-    var refundsJson = CryptoUtils.decryptJwe(response.getReport(), decryptionKey);
+      var restTemplate = new RestTemplate();
+      restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+      var responseJwe =
+          restTemplate.postForObject("http://localhost:8082/refunds", publicKey, String.class);
 
-    System.out.println("Response : " + JsonUtils.toJson(response));
-    System.out.println("ECDH derived key: " + Base64.getUrlEncoder().encodeToString(decryptionKey));
-    System.out.println("Decrypted Refunds ...");
-    System.out.println(refundsJson);
-    return refundsJson;
+      var refundsJWE = JWEObject.parse(responseJwe);
+      refundsJWE.decrypt(new X25519Decrypter(octetKeyPair));
+      var refundsJson = refundsJWE.getPayload().toString();
+
+      System.out.println("Refunds JWE : " + refundsJWE);
+      System.out.println(
+          "Warehouse public key: " + refundsJWE.getHeader().getEphemeralPublicKey().toJSONString());
+      System.out.println("Payments key pair: " + octetKeyPair.toJSONString());
+      System.out.println("Decrypted Refunds ...");
+      System.out.println(refundsJson);
+      return refundsJson;
+
+    } catch (JOSEException | ParseException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

@@ -18,10 +18,10 @@ There are three subprojects in this repo.
 The samples in this repo are for educational purposes to demonstrate security concepts in an easy
 to understand way. NO effort has been put into making the code production ready. The key 
 constraint for the code is that it can fit on a printed page and on slides. Therefore, we don't do 
-validation in places where it should be done, we don't handle Java exceptions in a production worthy
-way. Furthermore, the samples typically explains one aspect of security and do the simplest thing
-to make the sample work, for example storing keys in plain text files, which is super insecure and
-should not be done in production.
+validation in places where it should be done. We print secret keys to logs to explain the concepts.
+We don't handle Java exceptions in a production worthy way. Furthermore, the samples typically 
+explains one aspect of security and do the simplest thing to make the sample work, for example 
+storing keys in plain text files, which is super insecure and should not be done in production.
 
 Use this repo to learn security concepts so that you can better understand security protocols,
 patterns and libraries. Once you learn the concepts it is your responsibility to implement those
