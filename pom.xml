@@ -10,9 +10,9 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.example</groupId>
-  <artifactId>crypto-key-exchange-dh-jwk</artifactId>
+  <artifactId>crypto-key-exchange-ecdh-jwe</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>crypto-key-exchange-dh-jwk</name>
+  <name>crypto-key-exchange-ecdh-jwe</name>
   <packaging>pom</packaging>
   <description>Example showing how Diffie-Hellman Key Exchange Works in Java using JWK to represent the keys</description>
 
