@@ -1,4 +1,4 @@
-# crypto-key-exchange-dh-jwk
+# crypto-ecc-jwe
 
 Demo project showing how to use **Elliptic Curve Diffie-Hellman (ECDH)** key exchange to generate 
 a key for use with AES. Elliptic Curve 25519 is used for the key exchange, and the sample code
