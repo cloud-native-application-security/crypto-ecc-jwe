@@ -10,11 +10,11 @@
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
   <groupId>com.example</groupId>
-  <artifactId>crypto-key-exchange-ecdh-jwe</artifactId>
+  <artifactId>crypto-ecc-jwe</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <name>crypto-key-exchange-ecdh-jwe</name>
+  <name>crypto-ecc-jwe</name>
   <packaging>pom</packaging>
-  <description>Example showing how Diffie-Hellman Key Exchange Works in Java using JWK to represent the keys</description>
+  <description>Elliptic Curve Cryptography using JSON Web Encryption (JWE)</description>
 
   <properties>
     <java.version>11</java.version>
