@@ -1,12 +1,6 @@
 package com.example.payments;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.crypto.X25519Decrypter;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
-import java.text.ParseException;
+import com.example.util.EllipticCurveCipher;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -14,33 +8,27 @@ import org.springframework.web.client.RestTemplate;
 
 @RestController
 public class PaymentsController {
+  private final RestTemplate restTemplate;
+
+  public PaymentsController() {
+    this.restTemplate = new RestTemplate();
+    restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
+  }
 
   @GetMapping("/")
   public String processRefunds() {
-    try {
+    var ellipticCurveCipher = new EllipticCurveCipher();
 
-      OctetKeyPair octetKeyPair = new OctetKeyPairGenerator(Curve.X25519).generate();
-      var publicKey = octetKeyPair.toPublicJWK().toJSONString();
+    String refundsJwe =
+        restTemplate.postForObject(
+            "http://localhost:8082/refunds", ellipticCurveCipher.getPublicKey(), String.class);
+    var refundsJson = ellipticCurveCipher.decrypt(refundsJwe);
 
-      var restTemplate = new RestTemplate();
-      restTemplate.setRequestFactory(new HttpComponentsClientHttpRequestFactory());
-      var responseJwe =
-          restTemplate.postForObject("http://localhost:8082/refunds", publicKey, String.class);
-
-      var refundsJWE = JWEObject.parse(responseJwe);
-      refundsJWE.decrypt(new X25519Decrypter(octetKeyPair));
-      var refundsJson = refundsJWE.getPayload().toString();
-
-      System.out.println("Refunds JWE : " + refundsJWE);
-      System.out.println(
-          "Warehouse public key: " + refundsJWE.getHeader().getEphemeralPublicKey().toJSONString());
-      System.out.println("Payments key pair: " + octetKeyPair.toJSONString());
-      System.out.println("Decrypted Refunds ...");
-      System.out.println(refundsJson);
-      return refundsJson;
-
-    } catch (JOSEException | ParseException e) {
-      throw new RuntimeException(e);
-    }
+    System.out.println("Refunds JWE : " + refundsJwe);
+    System.out.println("Warehouse public key: " + ellipticCurveCipher.getPeerPublicKey(refundsJwe));
+    System.out.println("Payments key pair: " + ellipticCurveCipher.keyPairJson());
+    System.out.println("Decrypted Refunds ...");
+    System.out.println(refundsJson);
+    return refundsJson;
   }
 }

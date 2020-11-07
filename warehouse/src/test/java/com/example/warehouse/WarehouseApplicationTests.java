@@ -1,13 +1,7 @@
 package com.example.warehouse;
 
+import com.example.util.EllipticCurveCipher;
 import com.example.util.JsonUtils;
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWEObject;
-import com.nimbusds.jose.crypto.X25519Decrypter;
-import com.nimbusds.jose.jwk.Curve;
-import com.nimbusds.jose.jwk.OctetKeyPair;
-import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
-import java.text.ParseException;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,17 +17,14 @@ class WarehouseApplicationTests {
   private RestTemplate restTemplate = new RestTemplate();
 
   @Test
-  void testReportGeneration() throws JOSEException, ParseException {
+  void testReportGeneration() {
 
-    OctetKeyPair octetKeyPair = new OctetKeyPairGenerator(Curve.X25519).generate();
-    var publicKey = octetKeyPair.toPublicJWK().toJSONString();
+    var ellipticCurveCipher = new EllipticCurveCipher();
 
     var url = "http://localhost:" + port + "/refunds";
-    var responseJwe = restTemplate.postForObject(url, publicKey, String.class);
-
-    var refundsJWE = JWEObject.parse(responseJwe);
-    refundsJWE.decrypt(new X25519Decrypter(octetKeyPair));
-    var refundsJson = refundsJWE.getPayload().toString();
+    var responseJwe =
+        restTemplate.postForObject(url, ellipticCurveCipher.getPublicKey(), String.class);
+    var refundsJson = ellipticCurveCipher.decrypt(responseJwe);
 
     Refund[] refunds = JsonUtils.fromJson(refundsJson, Refund[].class);
     Assertions.assertThat(refunds).hasSize(2);
