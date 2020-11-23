@@ -11,20 +11,16 @@ import com.nimbusds.jose.jwk.JWK;
 import com.nimbusds.jose.jwk.OctetKeyPair;
 import java.text.ParseException;
 
-public class EllipticCurveEncryptor {
+public class EllipticCurveEncrypter {
 
   private final OctetKeyPair keyPair;
 
-  public EllipticCurveEncryptor(String jwk) {
+  public EllipticCurveEncrypter(String publicKey) {
     try {
-      this.keyPair = JWK.parse(jwk).toOctetKeyPair();
+      this.keyPair = JWK.parse(publicKey).toOctetKeyPair();
     } catch (ParseException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public String getPublicKey() {
-    return keyPair.toPublicJWK().toJSONString();
   }
 
   public String encrypt(String data) {
@@ -37,9 +33,5 @@ public class EllipticCurveEncryptor {
     } catch (JOSEException e) {
       throw new RuntimeException(e);
     }
-  }
-
-  public String keyPairJson() {
-    return this.keyPair.toJSONString();
   }
 }

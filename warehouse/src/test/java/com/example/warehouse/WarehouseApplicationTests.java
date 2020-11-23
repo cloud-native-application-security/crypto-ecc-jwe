@@ -1,6 +1,6 @@
 package com.example.warehouse;
 
-import com.example.util.EllipticCurveDecryptor;
+import com.example.util.EllipticCurveDecrypter;
 import com.example.util.JsonUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -19,7 +19,7 @@ class WarehouseApplicationTests {
   @Test
   void testReportGeneration() {
 
-    var ellipticCurveCipher = new EllipticCurveDecryptor();
+    var ellipticCurveCipher = new EllipticCurveDecrypter();
 
     var url = "http://localhost:" + port + "/refunds";
     var responseJwe =

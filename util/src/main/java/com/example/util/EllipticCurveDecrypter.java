@@ -8,11 +8,11 @@ import com.nimbusds.jose.jwk.OctetKeyPair;
 import com.nimbusds.jose.jwk.gen.OctetKeyPairGenerator;
 import java.text.ParseException;
 
-public class EllipticCurveDecryptor {
+public class EllipticCurveDecrypter {
 
   private final OctetKeyPair keyPair;
 
-  public EllipticCurveDecryptor() {
+  public EllipticCurveDecrypter() {
     try {
       this.keyPair = new OctetKeyPairGenerator(Curve.X25519).generate();
     } catch (JOSEException e) {

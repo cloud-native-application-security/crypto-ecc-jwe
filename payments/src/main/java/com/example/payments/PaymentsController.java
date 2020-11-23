@@ -1,6 +1,6 @@
 package com.example.payments;
 
-import com.example.util.EllipticCurveDecryptor;
+import com.example.util.EllipticCurveDecrypter;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,7 +17,7 @@ public class PaymentsController {
 
   @GetMapping("/")
   public String processRefunds() {
-    var ellipticCurveCipher = new EllipticCurveDecryptor();
+    var ellipticCurveCipher = new EllipticCurveDecrypter();
 
     String refundsJwe =
         restTemplate.postForObject(
@@ -26,7 +26,7 @@ public class PaymentsController {
 
     System.out.println("Refunds JWE : " + refundsJwe);
     System.out.println("Warehouse public key: " + ellipticCurveCipher.getPeerPublicKey(refundsJwe));
-    System.out.println("Payments key pair: " + ellipticCurveCipher.getPublicKey());
+    System.out.println("Payments public key: " + ellipticCurveCipher.getPublicKey());
     System.out.println("Decrypted Refunds ...");
     System.out.println(refundsJson);
     return refundsJson;
